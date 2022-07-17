@@ -1,0 +1,6 @@
+*.log
+.temp_files
+.terraform.lock.hcl
+.terraform
+builds
+terraform.tfstate*
