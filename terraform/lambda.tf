@@ -41,7 +41,7 @@ module "api_gateway" {
 module "lambda_function" {
   source = "terraform-aws-modules/lambda/aws"
 
-  function_name = "my-lambda1"
+  function_name = "my-lambda-${terraform.workspace}"
   description   = "My awesome lambda function"
   handler       = "main.hello"
   runtime       = "python3.8"

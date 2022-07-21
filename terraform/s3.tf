@@ -2,7 +2,7 @@ resource "template_file" "s3_policy" {
   template = file("./policy.json")
 
   vars = {
-    bucket_name            = "terraform-python-sample-bucket"
+    bucket_name            = "terraform-python-sample-bucket-${terraform.workspace}"
     origin_access_identity = module.cdn.cloudfront_origin_access_identity_ids[0]
   }
 }
@@ -10,7 +10,7 @@ resource "template_file" "s3_policy" {
 module "s3_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
-  bucket = "terraform-python-sample-bucket"
+  bucket = "terraform-python-sample-bucket-${terraform.workspace}"
   acl    = "public-read"
 
   versioning = {
