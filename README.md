@@ -110,11 +110,5 @@ $ terraform apply -var 'profile=default' -var 'domain_name=example.com' -var 'do
 作ったリソースを全部削除
 
 ```bash
-$ terraform destroy
-```
-
-※aws の認証情報をプロファイルで分けている場合は
-
-```bash
-$ serverless remove --aws-profile ${自分の設定したプロファイル名}
+$ terraform destroy -var 'profile=default' -var 'domain_name=example.com' -var 'domain_name_certificate_arn=arn:aws:acm:ap-northeast-1:xxxxxxxxxxxx:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
 ```
