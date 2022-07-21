@@ -85,7 +85,7 @@ $ choco install git
 
 # ワークスペースの設定
 
-````bash
+```bash
 $ terraform workspace new {ワークスペース名}
 $ terraform workspace select {ワークスペース名}
 ```
@@ -96,7 +96,7 @@ $ terraform workspace select {ワークスペース名}
 
 ```bash
 $ terraform plan -var 'profile=default' -var 'domain_name=example.com' -var 'domain_name_certificate_arn=arn:aws:acm:ap-northeast-1:xxxxxxxxxxxx:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
-````
+```
 
 # apply
 
