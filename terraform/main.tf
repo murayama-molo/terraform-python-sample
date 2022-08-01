@@ -1,4 +1,4 @@
-variable "profile" {}
+variable "profile" { default = "default" }
 
 provider "aws" {
   region  = "ap-northeast-1"

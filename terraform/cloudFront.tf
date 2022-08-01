@@ -1,5 +1,28 @@
+variable "domain_name" {
+  default = null
+}
+variable "domain_name_certificate_arn" {
+  default = null
+}
+
+locals {
+  domain_name                 = var.domain_name
+  domain_name_certificate_arn = var.domain_name_certificate_arn
+}
+
 module "cdn" {
   source = "terraform-aws-modules/cloudfront/aws"
+
+  aliases = local.domain_name != null ? [
+    local.domain_name
+  ] : null
+  viewer_certificate = local.domain_name_certificate_arn != null ? {
+    acm_certificate_arn = local.domain_name_certificate_arn
+    ssl_support_method  = "sni-only"
+    } : {
+    "cloudfront_default_certificate" : true,
+    "minimum_protocol_version" : "TLSv1"
+  }
 
   comment             = "My awesome CloudFront"
   enabled             = true

@@ -1,18 +1,8 @@
-
-variable "domain_name" {}
-variable "domain_name_certificate_arn" {}
-
-locals {
-  domain_name                 = var.domain_name # trimsuffix(data.aws_route53_zone.this.name, ".")
-  domain_name_certificate_arn = var.domain_name_certificate_arn
-  subdomain                   = "complete-http"
-}
-
 module "api_gateway" {
   source = "terraform-aws-modules/apigateway-v2/aws"
 
   name          = "dev-http"
-  description   = "My awesome HTTP API Gateway"
+  description   = "HTTP API Gateway"
   protocol_type = "HTTP"
 
   cors_configuration = {
@@ -21,36 +11,53 @@ module "api_gateway" {
     allow_origins = ["*"]
   }
 
-  domain_name                 = local.domain_name
-  domain_name_certificate_arn = local.domain_name_certificate_arn
+  create_api_domain_name = false
 
   # Routes and integrations
   integrations = {
     "GET /api/hello" = {
-      lambda_arn             = module.lambda_function.lambda_function_arn
-      payload_format_version = "2.0"
+      lambda_arn             = module.lambda_function_get_hello.lambda_function_arn
+      payload_format_version = "1.0"
       timeout_milliseconds   = 12000
+      request_templates = {
+        "application/json" = ""
+      }
+    },
+    "POST /api/hello" = {
+      lambda_arn             = module.lambda_function_post_hello.lambda_function_arn
+      payload_format_version = "1.0"
+      timeout_milliseconds   = 12000
+      request_templates = {
+        "application/json" = ""
+      }
+    }
+  }
+
+  authorizers = {
+    "aws" = {
+      authorizer_type                   = "REQUEST"
+      authorizer_uri                    = module.lambda_function_authorizer.lambda_function_invoke_arn
+      identity_sources                  = "$request.header.Authorization"
+      name                              = "lambda-authorizer"
+      authorizer_payload_format_version = "2.0"
+      enable_simple_responses           = true
     }
   }
 
   tags = {
-    Name = "http-apigateway"
+    workspace = terraform.workspace
   }
 }
 
-module "lambda_function" {
+module "lambda_function_get_hello" {
   source = "terraform-aws-modules/lambda/aws"
 
-  function_name = "my-lambda-${terraform.workspace}"
-  description   = "My awesome lambda function"
-  handler       = "main.hello"
+  function_name = "get-hello-${terraform.workspace}"
+  description   = "lambda function"
+  handler       = "handler.getHello"
   runtime       = "python3.8"
 
-  source_path = "../back"
-
-  tags = {
-    Name = "my-lambda1"
-  }
+  source_path = "../back/hello"
 
   publish = true
 
@@ -59,5 +66,50 @@ module "lambda_function" {
       service    = "apigateway"
       source_arn = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*"
     }
+  }
+
+  tags = {
+    workspace = terraform.workspace
+  }
+}
+
+module "lambda_function_post_hello" {
+  source = "terraform-aws-modules/lambda/aws"
+
+  function_name = "post-hello-${terraform.workspace}"
+  description   = "lambda function"
+  handler       = "handler.postHello"
+  runtime       = "python3.8"
+
+  source_path = "../back/hello"
+
+  publish = true
+
+  allowed_triggers = {
+    AllowExecutionFromAPIGateway = {
+      service    = "apigateway"
+      source_arn = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*"
+    }
+  }
+
+  tags = {
+    workspace = terraform.workspace
+  }
+}
+
+module "lambda_function_authorizer" {
+  source = "terraform-aws-modules/lambda/aws"
+
+  function_name = "authorizer-${terraform.workspace}"
+  description   = "lambda authorizer"
+  handler       = "handler.auth"
+  runtime       = "python3.8"
+
+  source_path = "../back/authorizer"
+
+  publish = false
+
+  tags = {
+    workspace = terraform.workspace
   }
 }

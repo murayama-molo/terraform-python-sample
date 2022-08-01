@@ -1,0 +1,33 @@
+service: terraform-python-sample-back
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: python3.8
+
+functions:
+  getHello:
+    handler: hello/handler.getHello
+    name: hello
+    description: GET テストAPI
+    timeout: 15
+    memorySize: 128
+    events:
+      - http:
+          path: "api/hello"
+          method: get
+          integration: lambda
+  postHello:
+    handler: hello/handler.postHello
+    name: hello
+    description: POST テストAPI
+    timeout: 15
+    memorySize: 128
+    events:
+      - http:
+          path: "api/hello"
+          method: post
+          integration: lambda
+
+plugins:
+  - serverless-offline
