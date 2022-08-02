@@ -1,7 +1,7 @@
 module "api_gateway" {
   source = "terraform-aws-modules/apigateway-v2/aws"
 
-  name          = "dev-http"
+  name          = "dev-http-${terraform.workspace}"
   description   = "HTTP API Gateway"
   protocol_type = "HTTP"
 
@@ -17,28 +17,32 @@ module "api_gateway" {
   integrations = {
     "GET /api/hello" = {
       lambda_arn             = module.lambda_function_get_hello.lambda_function_arn
-      payload_format_version = "1.0"
+      payload_format_version = "2.0"
       timeout_milliseconds   = 12000
       request_templates = {
         "application/json" = ""
       }
+      authorization_type = "CUSTOM"
+      authorizer_key     = "authorizer"
     },
     "POST /api/hello" = {
       lambda_arn             = module.lambda_function_post_hello.lambda_function_arn
-      payload_format_version = "1.0"
+      payload_format_version = "2.0"
       timeout_milliseconds   = 12000
       request_templates = {
         "application/json" = ""
       }
+      authorization_type = "CUSTOM"
+      authorizer_key     = "authorizer"
     }
   }
 
   authorizers = {
-    "aws" = {
+    "authorizer" = {
       authorizer_type                   = "REQUEST"
       authorizer_uri                    = module.lambda_function_authorizer.lambda_function_invoke_arn
-      identity_sources                  = "$request.header.Authorization"
-      name                              = "lambda-authorizer"
+      identity_sources                  = ["$request.header.Authorization"]
+      name                              = "authorizer"
       authorizer_payload_format_version = "2.0"
       enable_simple_responses           = true
     }

@@ -50,7 +50,7 @@ module "cdn" {
     }
 
     s3_one = {
-      domain_name = "terraform-python-sample-bucket.s3.ap-northeast-1.amazonaws.com"
+      domain_name = module.s3_bucket.s3_bucket_bucket_regional_domain_name
       s3_origin_config = {
         origin_access_identity = "s3_bucket_one"
       }

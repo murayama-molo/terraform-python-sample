@@ -17,9 +17,9 @@ module "s3_bucket" {
     enabled = true
   }
 
-  # website = {
-  #   index_document = "index.html"
-  # }
+  website = {
+    index_document = "index.html"
+  }
 
   # Bucket policies
   attach_policy                         = true
