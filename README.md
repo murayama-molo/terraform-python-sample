@@ -28,6 +28,12 @@ asdf --version
 v0.10.2
 ```
 
+## git
+
+```bash
+git version 2.35.1
+```
+
 ## terraform
 
 ```bash
@@ -70,6 +76,14 @@ Default region name [None]: ap-northeast-1
 Default output format [None]: json
 ```
 
+## git
+
+```bach
+sudo apt-get install git
+
+git --version
+```
+
 ## terraform
 
 ```bash
@@ -77,7 +91,7 @@ Default output format [None]: json
 $ sudo -i asdf plugin add terraform
 
 # インストール可能なバージョンの確認
-$ sudo -i asdf list-all python
+$ sudo -i asdf list-all terraform
 
 # バージョンを指定してインストール
 $ sudo -i asdf install terraform 1.2.5
